@@ -1,0 +1,70 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyo
+
+# Virtual Environments
+venv/
+.env/
+.venv/
+env/
+
+# Environment variables
+.env
+.env.local
+
+# ========================
+# Logs
+# ========================
+*.log
+logs/
+
+# ========================
+# Data Files (optional)
+# ========================
+# Uncomment if datasets should not be committed
+# backend/data/*.csv
+
+# ========================
+# Jupyter
+# ========================
+.ipynb_checkpoints/
+
+# ========================
+# VS Code
+# ========================
+.vscode/
+
+# ========================
+# macOS
+# ========================
+.DS_Store
+
+# ========================
+# Test / Coverage
+# ========================
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ========================
+# Build
+# ========================
+dist/
+build/
+*.egg-info/
+
+# ========================
+# Streamlit
+# ========================
+.streamlit/
+
+# ========================
+# OS Generated
+# ========================
+Thumbs.db
