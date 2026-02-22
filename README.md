@@ -41,8 +41,7 @@ No external APIs. Fully local and portable.
 
 ## 🏗 Architecture
 
-The system follows strict separation of concerns.
-'''
+```
 backend/
 │
 ├── main.py
@@ -56,7 +55,8 @@ backend/
 dashboard/
 docs/
 tests/
-'''
+```
+
 
 ### Layer Responsibilities
 
