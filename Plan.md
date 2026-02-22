@@ -1,73 +1,34 @@
-# SIET Hackathon Plan
+# Hackathon Execution Plan
 
----
+Day 1
+- Finalize schema
+- Setup project structure
+- Implement FastAPI skeleton
 
-## Phase 1: Data Modeling
+Day 2
+- Create synthetic digital twin dataset
+- Implement room + booking models
 
-- Define room schema
-- Generate synthetic booking history
-- Implement SQLite storage
+Day 3
+- Implement prediction module
+- Train logistic regression
+- Validate outputs
 
-Deliverable: Functional digital twin dataset
+Day 4
+- Implement OR-Tools allocation
+- Add constraints
+- Add fallback allocator
 
----
+Day 5
+- Implement simulation engine
+- Compute utilization metrics
 
-## Phase 2: Availability Model
+Day 6
+- Build Streamlit dashboard
+- Integrate full pipeline
 
-- Feature engineering
-- Train logistic regression or random forest
-- Output idle probability
-
-Deliverable: Working predictor API
-
----
-
-## Phase 3: Demand Forecast
-
-- Aggregate booking requests
-- Implement time-based forecasting
-
-Deliverable: Demand intensity score
-
----
-
-## Phase 4: Allocation Engine
-
-- Implement OR-Tools solver
-- Add fairness constraints
-- Integrate predictions
-
-Deliverable: Optimized allocation output
-
----
-
-## Phase 5: What-If Simulation
-
-- Constraint toggling
-- Re-optimization
-- Utilization comparison
-
-Deliverable: Simulation mode
-
----
-
-## Phase 6: Dashboard Integration
-
-- Idle heatmap
-- Allocation results table
-- Simulation comparison view
-
-Deliverable: Demo-ready interface
-
----
-
-## Risks & Mitigation
-
-Risk: Model underperformance  
-Mitigation: Emphasize explainability.
-
-Risk: Optimization complexity  
-Mitigation: Limit to 10–20 rooms.
-
-Risk: Time constraint  
-Mitigation: Prioritize prediction + allocation.
+Day 7
+- Add structured logging
+- Edge-case testing
+- Fresh environment validation
+- Demo script preparation

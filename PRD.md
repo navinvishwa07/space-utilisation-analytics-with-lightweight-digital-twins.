@@ -1,113 +1,94 @@
-# Product Requirements Document
-## Shared Infrastructure Exchange Twin (SIET)
+# Shared Infrastructure Exchange Twin (SIET)
+
+## 1. Overview
+
+SIET is a predictive allocation engine that models institutional spaces as digital twins, forecasts idle availability, and optimally matches demand using constraint-based optimization.
+
+This MVP focuses on intelligence and allocation — not full marketplace infrastructure.
 
 ---
 
-## Product Vision
+## 2. Problem Statement
 
-Unlock idle infrastructure capacity using predictive analytics and fairness-aware optimization.
+Institutional infrastructure (classrooms, halls, labs) is frequently underutilized.
 
----
+Existing systems:
+- Show availability statically
+- Do not predict future idle slots
+- Do not optimize allocation
+- Do not simulate utilization improvement
 
-## Problem Statement
-
-Infrastructure remains underutilized due to static scheduling systems and lack of predictive visibility.
-
-Institutions cannot:
-- Anticipate idle capacity
-- Fairly distribute unused space
-- Simulate operational impact before allocation
+There is no lightweight predictive allocation engine that increases utilization proactively.
 
 ---
 
-## Value Proposition
+## 3. Core Value Proposition
 
-SIET predicts idle infrastructure and intelligently redistributes it using transparent, fairness-constrained optimization.
-
----
-
-## User Personas
-
-### Facility Administrator
-Needs predictive visibility and allocation control.
-
-### NGO Coordinator
-Needs access to verified, affordable space.
-
-### Urban Planner
-Needs analytics on utilization efficiency.
+Predict idle capacity  
+Optimize allocation  
+Simulate improvement  
 
 ---
 
-## Functional Requirements
+## 4. Hackathon MVP Scope (Strict)
 
-- Predict idle probability per room/time slot
-- Forecast demand intensity
-- Optimize allocation with fairness rules
-- Provide what-if simulation
-- Log allocation decisions
+### Included
 
----
+• Digital twin modeling (rooms, slots, constraints)  
+• Idle probability prediction (ML baseline model)  
+• Constraint-based matching engine  
+• Simulation engine (before vs after utilization)  
+• Simple admin interface (Streamlit)  
+• Structured logging  
 
-## Non-Functional Requirements
+### Explicitly Excluded
 
-- Optimization runtime < 3 seconds
-- Deterministic outputs
-- Modular architecture
-- Local deployment capability
-
----
-
-## User Flow
-
-Admin:
-Login → View idle prediction →  
-Review optimized allocation →  
-Run simulation →  
-Approve or override
-
-External Requester:
-Submit request → Await admin approval
+• Real payments  
+• JWT authentication  
+• IoT integration  
+• Real-time streaming  
+• Multi-tenant production hosting  
+• CI/CD pipelines  
 
 ---
 
-## KPIs
+## 5. Users (MVP Context)
 
-- Utilization increase %
-- Idle reduction %
-- Fairness distribution score
-- Allocation acceptance rate
+Single institutional admin using system locally.
 
 ---
 
-## Acceptance Criteria
+## 6. Functional Requirements
 
-- Idle probability outputs generated
-- Allocation respects all constraints
-- Simulation produces consistent results
-- Audit logs record decisions
-
----
-
-## Edge Case Handling
-
-- Overcapacity request → reject
-- Low-confidence prediction → manual review
-- Solver failure → fallback heuristic
+FR1: System loads space inventory dataset  
+FR2: System trains idle probability model  
+FR3: System predicts idle score per slot  
+FR4: System matches requests using constraints  
+FR5: System prevents double booking  
+FR6: System simulates utilization improvement  
+FR7: System logs allocation decisions  
 
 ---
 
-## Regulatory Considerations
+## 7. Constraints
 
-- Institutional data privacy
-- Transparent allocation logic
-- Human approval required
+Capacity must satisfy request  
+No overlapping time slots  
+One allocation per slot  
+Priority weight impacts objective score  
 
 ---
 
-## Future Expansion
+## 8. Success Metrics
 
-- Multi-institution federation
-- Climate resilience modeling
-- Smart city API integration
-- Infrastructure economic analytics
+Utilization improvement %  
+Allocation success rate  
+Conflict-free booking validation  
+
+---
+
+## 9. Risks & Mitigation
+
+Solver infeasibility → fallback greedy allocator  
+ML overfitting → simple interpretable baseline  
+Scope creep → enforce strict MVP boundary  

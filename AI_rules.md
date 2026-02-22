@@ -1,109 +1,44 @@
-# SIET AI Governance Rules
+# AI Development Rules
+
+## 1. Code Discipline
+
+No hardcoded paths  
+No silent exception swallowing  
+All inputs validated  
+All errors logged  
 
 ---
 
-## 1. System Purpose
+## 2. ML Rules
 
-SIET predicts idle infrastructure capacity and optimizes allocation while preserving fairness and governance integrity.
+Use interpretable model  
+Log model version  
+Document feature assumptions  
+Allow retraining entry point  
 
-The system provides recommendations only. Final authority remains with administrators.
-
----
-
-## 2. Data Governance
-
-### Data Used
-- Room metadata
-- Historical booking data
-- Booking request metadata
-
-### Data Not Used
-- Personal identifiers
-- Surveillance data
-- Biometric inputs
-
-All MVP data stored locally.
+No deep learning black boxes.
 
 ---
 
-## 3. Predictive Model Constraints
+## 3. Matching Rules
 
-- Models provide advisory predictions.
-- Confidence scores must accompany predictions.
-- Low-confidence predictions require manual review.
-- No automatic booking confirmations.
-
----
-
-## 4. Allocation Fairness Rules
-
-Priority tiers:
-
-1. Academic / Institutional
-2. Public Service / NGO
-3. Commercial / External
-
-Additional constraints:
-- Capacity enforcement
-- No time conflicts
-- Stakeholder usage cap
-- Transparent scoring logic
+Never bypass constraint checks  
+Never allow overlapping allocation  
+Always validate capacity  
+Fallback mechanism required  
 
 ---
 
-## 5. Simulation Integrity
+## 4. Security Simplification
 
-- Simulations must not alter live data.
-- Simulated results clearly labeled.
-- Deterministic output given identical inputs.
-
----
-
-## 6. Bias Mitigation
-
-- Tier-based priority weighting
-- Usage share tracking
-- Allocation fairness score logging
+No authentication for MVP  
+Assume trusted local admin  
+Do not simulate fake payment logic  
 
 ---
 
-## 7. Transparency
+## 5. Scope Enforcement
 
-For each allocation decision log:
-- Idle probability
-- Demand intensity
-- Priority tier applied
-- Optimization objective value
-
----
-
-## 8. Logging & Audit Trail
-
-All actions log:
-- Timestamp
-- Input parameters
-- Optimization result
-- Override reason (if applicable)
-
-Logs are immutable.
-
----
-
-## 9. Fallback Policy
-
-If model confidence < threshold:
-- Flag for manual review.
-
-If optimization fails:
-- Revert to first-come-first-serve heuristic.
-
----
-
-## 10. Governance Override
-
-Administrators may:
-- Override allocation
-- Lock rooms
-- Adjust tier weights
-
-All overrides must be logged.
+Do not introduce marketplace features  
+Do not add production-grade auth  
+Do not expand to multi-tenant SaaS  

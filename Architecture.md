@@ -1,115 +1,96 @@
-# SIET System Architecture
+# System Architecture
 
----
+## 1. High-Level Architecture
 
-## High-Level Overview
-
-Users
-  ↓
 Streamlit Dashboard
-  ↓
+        |
 FastAPI Backend
-  ↓
-Prediction Module → Allocation Engine
-  ↓
-SQLite Database
+        |
+-------------------------
+| Prediction Module     |
+| Matching Module       |
+| Simulation Module     |
+-------------------------
+        |
+CSV / SQLite Data Store
 
 ---
 
-## Core Modules
+## 2. Layered Architecture
 
-### 1. Data Layer
+Controller Layer
+- API endpoints
+- Input validation
 
-Tables:
-- Rooms
-- Booking History
-- Requests
-- Allocation Logs
+Service Layer
+- Prediction service
+- Matching service
+- Simulation service
 
----
+Domain Layer
+- Room model
+- Booking request model
+- Constraint logic
 
-### 2. Availability Prediction Pipeline
-
-Historical Data
-→ Feature Engineering
-→ Train Model (Scikit-learn)
-→ Idle Probability Output
-→ Confidence Score
-
----
-
-### 3. Demand Forecast Pipeline
-
-Historical Requests
-→ Time Aggregation
-→ Forecast Model
-→ Demand Intensity Score
+Data Layer
+- CSV / SQLite access
+- No hardcoded paths
 
 ---
 
-### 4. Allocation Engine (OR-Tools)
+## 3. Prediction Module
+
+Model: Logistic Regression  
+Inputs:
+- Day of week
+- Time slot
+- Historical utilization %
+- Room type
+Output:
+- Idle probability (0–1)
+
+Model version logged.
+
+---
+
+## 4. Matching Engine
+
+Optimization: OR-Tools Integer Programming
 
 Objective:
-Maximize predicted idle utilization × priority weight
+Maximize idle_probability × priority_weight
 
 Constraints:
-- No conflicts
-- Capacity limits
-- Tier enforcement
-- Stakeholder usage cap
+- Capacity constraint
+- Non-overlap constraint
+- One allocation per slot
+- Deterministic assignment
+
+Fallback:
+Greedy allocator if solver fails.
 
 ---
 
-### 5. Simulation Engine
+## 5. Simulation Engine
 
-Temporary constraint injection:
-- Block room
-- Add event
-- Modify tier weight
-
-Re-run prediction + optimization.
-
-Return comparison metrics:
-- Utilization %
-- Fairness score
-- Allocation delta
+Calculates:
+Pre-allocation utilization  
+Post-allocation utilization  
+Improvement percentage  
 
 ---
 
-## API Endpoints
+## 6. Observability
 
-- /predict_availability
-- /forecast_demand
-- /optimize_allocation
-- /simulate
-- /audit_logs
-
----
-
-## Authentication (MVP)
-
-- Admin token authentication
-- Read-only public dashboard view
+Structured JSON logs  
+Request ID tagging  
+Model version logging  
+Allocation decision logging  
 
 ---
 
-## Scalability Plan
+## 7. Failure Isolation
 
-Post-MVP:
-- PostgreSQL migration
-- Separate prediction microservice
-- Docker containerization
-- Multi-institution federation
-
----
-
-## Resilience Twin Extension
-
-Future plug-in module:
-
-- Indoor heat risk model
-- Ventilation load estimator
-- Crowd density stress predictor
-- Emergency redistribution simulation
-
-Uses same simulation + allocation framework.
+Prediction failure → default baseline probability  
+Solver failure → greedy fallback  
+System restart → reload state from dataset  
