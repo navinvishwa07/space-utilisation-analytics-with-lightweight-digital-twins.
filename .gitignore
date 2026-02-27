@@ -31,6 +31,12 @@ logs/
 # backend/data/*.csv
 
 # ========================
+# Database Files
+# ========================
+*.db
+siet.db
+
+# ========================
 # Jupyter
 # ========================
 .ipynb_checkpoints/
