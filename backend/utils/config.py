@@ -52,12 +52,14 @@ class Settings:
     app_version: str
     log_level: str
     database_path: Path
+    synthetic_dataset_filename: str
 
     synthetic_seed_days: int
     synthetic_time_slots: Tuple[str, ...]
     synthetic_weekday_occupied_probability: float
     synthetic_weekend_occupied_probability: float
     synthetic_random_seed: int
+    synthetic_reference_end_date: str
 
     prediction_model_max_iter: int
     prediction_random_state: int
@@ -89,6 +91,10 @@ def get_settings() -> Settings:
         app_version=os.getenv("APP_VERSION", "1.0.0"),
         log_level=os.getenv("LOG_LEVEL", "INFO"),
         database_path=data_dir / os.getenv("DATABASE_FILENAME", "siet.db"),
+        synthetic_dataset_filename=os.getenv(
+            "SYNTHETIC_DATASET_FILENAME",
+            "synthetic_dataset.csv",
+        ),
         synthetic_seed_days=_env_int("SYNTHETIC_SEED_DAYS", 21),
         synthetic_time_slots=_env_csv(
             "SYNTHETIC_TIME_SLOTS",
@@ -103,6 +109,10 @@ def get_settings() -> Settings:
             0.35,
         ),
         synthetic_random_seed=_env_int("SYNTHETIC_RANDOM_SEED", 42),
+        synthetic_reference_end_date=os.getenv(
+            "SYNTHETIC_REFERENCE_END_DATE",
+            "2026-02-21",
+        ),
         prediction_model_max_iter=_env_int("PREDICTION_MODEL_MAX_ITER", 500),
         prediction_random_state=_env_int("PREDICTION_RANDOM_STATE", 42),
         prediction_min_training_rows=_env_int("PREDICTION_MIN_TRAINING_ROWS", 20),
