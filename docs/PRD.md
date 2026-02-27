@@ -7,41 +7,50 @@
 
 The Space Utilization Digital Twin is a predictive and optimization-driven system that identifies underutilized institutional spaces and intelligently allocates them to external demand while preserving fairness and efficiency.
 
-The system combines:
+The system integrates historical occupancy modeling, idle probability prediction, demand forecasting, constraint-based optimization, and simulation-driven policy testing.
 
-- Historical occupancy modeling
-- Idle probability prediction
-- Demand forecasting
-- Constraint-based optimization
-- Simulation-based policy testing
-
-The core objective is to maximize idle space activation while balancing stakeholder fairness.
+The primary objective is to maximize idle space activation while balancing stakeholder fairness.
 
 ---
 
-## 2. Core Objectives
+## 2. Problem Statement
+
+Institutions frequently experience fragmented and underutilized infrastructure. Classrooms, auditoriums, halls, and parking spaces remain unused during certain time windows, while external demand for such infrastructure exists but is not dynamically matched.
+
+Traditional booking systems are reactive. They do not:
+
+- Predict idle capacity
+- Optimize allocation under constraints
+- Balance stakeholder priority dynamically
+- Support policy simulation
+
+This system addresses those gaps.
+
+---
+
+## 3. Core Objectives
 
 - Predict room idle probability using historical booking data
 - Forecast demand intensity across time blocks
-- Allocate space using constraint optimization
+- Allocate space using mathematical optimization
 - Provide simulation mode for policy experimentation
-- Preserve system reproducibility and determinism
+- Maintain deterministic reproducibility
 
 ---
 
-## 3. System Architecture Principles
+## 4. System Architecture Principles
 
-- Clean separation: Controllers → Services → Repository
-- No direct database access inside services
-- Idempotent startup behavior
+- Strict separation: Controllers → Services → Repository
+- No direct database access inside business logic services
+- Idempotent startup initialization
 - Deterministic synthetic dataset generation
-- Config-driven thresholds (no hardcoding)
-- SQLite-backed persistence
-- Optimization powered by CP-SAT solver
+- Config-driven thresholds
+- SQLite-backed persistence layer
+- CP-SAT solver for allocation optimization
 
 ---
 
-## 4. Data Layer (Day 1)
+## 5. Data Layer (Day 1)
 
 ### Tables
 
@@ -52,159 +61,136 @@ The core objective is to maximize idle space activation while balancing stakehol
 - AllocationLogs
 - DemandForecastLogs
 
-### Synthetic Dataset
+### Synthetic Dataset Requirements
 
-The system uses a deterministic synthetic dataset as the historical source of truth.
-
-Dataset Specifications:
-
-- 10 rooms (IDs 1–10)
+- 10 rooms
 - 21 days of historical data
-- 4 daily time slots:
+- 4 time slots per day:
   - 09-11
   - 11-13
   - 14-16
   - 16-18
 - Weekday occupancy probability: 0.65–0.75
 - Weekend occupancy probability: 0.30–0.40
-- Fixed random seed for reproducibility
-- No derived features stored
+- Fixed random seed
 - No missing values
+- No duplicate records
+- Unique composite key (room_id, date, time_slot)
 
-Startup behavior:
+### Startup Behavior
 
-- If `synthetic_dataset.csv` exists → validate and load
-- If not → generate deterministically and load
+- If synthetic_dataset.csv exists → validate and load
+- If not → generate deterministically
 - No duplicate inserts on restart
-- Unique composite key on (room_id, date, time_slot)
+- Database seeding must be idempotent
 
 ---
 
-## 5. Idle Probability Prediction (Day 2)
+## 6. Idle Probability Prediction (Day 2)
 
-### Model Design
+### Model
 
 - Logistic Regression classifier
-- Trained on BookingHistory
-- Feature engineering:
-  - Day of week
-  - Time slot encoding
-  - Historical frequency
-  - Room ID
+- Trained using BookingHistory table
+
+### Features
+
+- Day of week
+- Time slot encoding
+- Historical frequency
+- Room ID encoding
 
 ### Output
 
-- Idle probability (0–1)
-- Confidence score (heuristic-based)
-- Stored in Predictions table
+- Idle probability score (0–1)
+- Confidence score
+- Persisted in Predictions table
 
-### Operational Behavior
+### Operational Constraints
 
 - Model trains once at startup
-- Inference does not retrain
-- Predictions persisted for auditability
+- No retraining during inference
+- Predictions stored for audit and traceability
 
 ---
 
-## 6. Demand Forecasting (Day 3)
+## 7. Demand Forecasting (Day 3)
 
-The system aggregates historical requests by:
+The system aggregates request history to compute demand intensity per time block.
 
-- Date
-- Time block
+Output stored in DemandForecastLogs.
 
-A demand intensity score is computed and stored in DemandForecastLogs.
+Forecasting supports:
 
-Forecast data is used for analytics and scenario evaluation.
+- Allocation analytics
+- Simulation evaluation
+- Policy stress testing
 
 ---
 
-## 7. Allocation Engine (Day 3)
+## 8. Allocation Engine (Day 3)
 
 ### Optimization Model
 
-The allocation engine uses a CP-SAT optimization model.
+Uses CP-SAT constraint solver.
 
 Objective Function:
 
 Maximize:
 
-```
-idle_probability × priority_weight
-```
+idle_probability × stakeholder_priority_weight
 
-This is a **weighted optimization model**, not a strict tier enforcement system.
+This is a weighted optimization design rather than rigid tier blocking.
 
 ### Hard Constraints
 
 - Room capacity limit
-- No time-slot conflicts (per optimization run)
+- No overlapping allocations per room per slot
 - Stakeholder usage cap
 - Minimum idle probability threshold
+- One allocation per request per slot
 
-### Priority Handling Design
+### Design Rationale
 
-Stakeholder priority is implemented as an objective weight rather than a blocking constraint.
+Weighted objective optimization ensures:
 
-This ensures:
-
-- Higher-priority stakeholders are favored
-- Overall utilization remains maximized
-- The solver preserves global optimality
-- The system avoids rigid hierarchical bottlenecks
-
-Rationale:
-
-Hard tier constraints can reduce total utilization and create infeasible allocations during high-demand periods. A weighted objective approach balances fairness with efficiency.
+- High-priority stakeholders are favored
+- Global utilization remains maximized
+- Feasibility remains high under heavy demand
+- System avoids rigid hierarchical inefficiencies
 
 ---
 
-## 8. Simulation Mode (Day 4)
+## 9. Simulation Mode (Day 4)
 
-The system includes a policy simulation endpoint.
+The system provides a policy simulation endpoint.
 
 Capabilities:
 
-- Inject temporary constraints
-- Re-run prediction + optimization
-- Compare baseline vs simulated utilization
-- Compute delta utilization
+- Inject temporary constraint overrides
+- Re-run prediction and allocation
+- Compare baseline vs simulated outcomes
+- Compute utilization delta
 
-Simulation rules:
+Simulation Rules:
 
-- No writes to production tables
-- In-memory constraint overrides only
+- No mutation of production tables
+- In-memory overrides only
 - Deterministic outputs under fixed seed
-- No state mutation across runs
+- No persistent side effects
 
 ---
 
-## 9. Edge Case Handling
+## 10. Edge Case Handling
 
 The system handles:
 
-- No feasible solution scenarios
+- No feasible allocation scenarios
 - Demand exceeding supply
 - Zero available rooms
-- Missing prediction data
-- Invalid request inputs
-
----
-
-## 10. Design Philosophy
-
-The Digital Twin prioritizes:
-
-**Utilization efficiency with fairness influence**
-
-Rather than enforcing rigid hierarchical access control, the system dynamically balances stakeholder importance with global space activation goals.
-
-This design makes the system adaptable across:
-
-- Universities
-- Public institutions
-- NGOs
-- Corporate shared infrastructure models
+- Missing prediction entries
+- Invalid input payloads
+- Duplicate request detection
 
 ---
 
@@ -214,19 +200,30 @@ The system qualifies as MVP-complete when:
 
 - Synthetic dataset loads reproducibly
 - Model trains deterministically
-- Allocation engine runs with all constraints
+- Allocation engine respects all constraints
 - Simulation produces stable comparative metrics
-- No runtime artifacts are committed to version control
-- Architecture passes clean separation review
+- No runtime artifacts are version-controlled
+- Clean architectural separation is maintained
 
 ---
 
 ## 12. Future Enhancements
 
-- True tier-based lexicographic optimization
-- Multi-day rolling optimization
-- Real-time demand streaming
-- Dashboard visualization layer
-- Explainability scoring for allocation decisions
+- True lexicographic tier optimization
+- Multi-day rolling allocation planning
+- Real-time streaming demand ingestion
+- Visualization dashboard
+- Explainable allocation scoring
+- Multi-institution federation support
+
+---
+
+## 13. Design Philosophy
+
+The Digital Twin prioritizes:
+
+Utilization efficiency with fairness influence.
+
+The system balances optimization rigor with adaptability, making it applicable across universities, public institutions, NGOs, and shared infrastructure networks.
 
 ---
